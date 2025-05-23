@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Manager Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        /* Basic styles for our simulated Shadcn components */
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .card-header {
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 1.25em;
+            font-weight: bold;
+        }
+        .card-content {
+            padding-top: 8px;
+        }
+        .button {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.875em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .button[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .button-outline {
+            background-color: white;
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+        .button-outline:hover {
+            background-color: #e0f2fe; /* blue-50 */
+        }
+        .input, .textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+        .label {
+            display: block;
+            font-size: 0.875em;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .switch {
+            /* Very basic representation of a switch */
+            width: 40px;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .switch.checked {
+            background-color: #10b981; /* green-500 */
+        }
+        .switch-thumb {
+            width: 18px;
+            height: 18px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            transition: transform 0.2s;
+        }
+        .switch.checked .switch-thumb {
+            transform: translateX(20px);
+        }
+        .badge {
+            background-color: #e2e8f0; /* gray-200 */
+            color: #475569; /* gray-700 */
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            display: inline-block;
+        }
+        .grid-cols-1 { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .md\:grid-cols-2 { @media (min-width: 768px) { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        .lg\:grid-cols-3 { @media (min-width: 1024px) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        .gap-4 { gap: 16px; }
+        .space-y-4 > *:not(:last-child) { margin-bottom: 16px; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .gap-2 { gap: 8px; }
+        .gap-1 { gap: 4px; }
+        .pt-6 { padding-top: 24px; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .max-w-6xl { max-width: 1152px; }
+        .p-6 { padding: 24px; }
+        .text-3xl { font-size: 1.875em; }
+        .font-bold { font-weight: 700; }
+        .text-gray-900 { color: #1a202c; }
+        .text-gray-600 { color: #4a5568; }
+        .mt-1 { margin-top: 4px; }
+        .text-sm { font-size: 0.875em; }
+        .text-2xl { font-size: 1.5em; }
+        .text-blue-500 { color: #3b82f6; }
+        .text-green-500 { color: #10b981; }
+        .text-purple-500 { color: #8b5cf6; }
+        .text-lg { font-size: 1.125em; }
+        .font-medium { font-weight: 500; }
+        .text-gray-700 { color: #2d3748; }
+        .font-mono { font-family: monospace; }
+        .text-xs { font-size: 0.75em; }
+        .bg-gray-100 { background-color: #f7fafc; }
+        .p-2 { padding: 8px; }
+        .rounded { border-radius: 0.25rem; }
+        .break-all { word-break: break-all; }
+        .pb-3 { padding-bottom: 12px; }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .text-gray-500 { color: #6b7280; }
+        .flex-wrap { flex-wrap: wrap; }
+        .text-center { text-align: center; }
+        .h-12 { height: 48px; }
+        .w-12 { width: 48px; }
+        .mb-4 { margin-bottom: 16px; }
+        .h-4 { height: 16px; }
+        .w-4 { width: 16px; }
+        .h-8 { height: 32px; }
+        .w-8 { width: 32px; }
+        .hover\:shadow-lg:hover { box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .transition-shadow { transition-property: box-shadow; transition-duration: 0.15s; }
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        // --- SIMULATED SHADCN UI COMPONENTS (VERY BASIC) ---
+        // These are minimal implementations to prevent errors and show some styling
+        // They do NOT replicate Shadcn's full features or accessibility
+        const Card = ({ children, className }) => <div className={`card ${className || ''}`}>{children}</div>;
+        const CardHeader = ({ children, className }) => <div className={`card-header ${className || ''}`}>{children}</div>;
+        const CardTitle = ({ children, className }) => <h2 className={`card-title ${className || ''}`}>{children}</h2>;
+        const CardContent = ({ children, className }) => <div className={`card-content ${className || ''}`}>{children}</div>;
+
+        const Button = ({ children, onClick, disabled, variant, className }) => {
+            let btnClass = "button";
+            if (variant === "outline") {
+                btnClass += " button-outline";
+            }
+            return (
+                <button
+                    onClick={onClick}
+                    disabled={disabled}
+                    className={`${btnClass} ${className || ''}`}
+                >
+                    {children}
+                </button>
+            );
+        };
+
+        const Input = ({ id, value, onChange, placeholder, type = "text", min, required }) => (
+            <input
+                id={id}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                type={type}
+                min={min}
+                required={required}
+                className="input"
+            />
+        );
+
+        const Label = ({ htmlFor, children, className }) => (
+            <label htmlFor={htmlFor} className={`label ${className || ''}`}>
+                {children}
+            </label>
+        );
+
+        const Textarea = ({ id, value, onChange, placeholder, rows, className }) => (
+            <textarea
+                id={id}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                rows={rows}
+                className={`textarea ${className || ''}`}
+            />
+        );
+
+        const Switch = ({ id, checked, onCheckedChange, className }) => (
+            <div
+                id={id}
+                className={`switch ${checked ? 'checked' : ''} ${className || ''}`}
+                onClick={() => onCheckedChange(!checked)}
+            >
+                <div className="switch-thumb"></div>
+            </div>
+        );
+
+        const Badge = ({ children, variant, className }) => {
+            let badgeClass = "badge";
+            if (variant === "secondary") {
+                // Our simple badge just has one style
+            }
+            return <span className={`${badgeClass} ${className || ''}`}>{children}</span>;
+        };
+
+        // --- MOCK LUCIDE REACT ICONS (PLACEHOLDERS) ---
+        // Since we don't have a bundler, importing from 'lucide-react' directly won't work.
+        // We'll just create empty components that render nothing or simple text.
+        const Plus = ({ className }) => <span className={className}>[+]</span>;
+        const Database = ({ className }) => <span className={className}>[DB]</span>;
+        const Users = ({ className }) => <span className={className}>[Usr]</span>;
+        const Share2 = ({ className }) => <span className={className}>[Shr]</span>;
+        const Eye = ({ className }) => <span className={className}>[Eye]</span>;
+
+
+        // --- YOUR GRAPHMANAGER COMPONENT CODE GOES HERE ---
+        // Make sure to remove the original imports that point to '@/components/ui'
+        // and replace them with the mock components defined above.
+
+        const { useState, useEffect } = React; // Destructure React hooks here
+
+        const GraphManager = () => {
+            const [graphs, setGraphs] = useState([]);
+            const [totalGraphs, setTotalGraphs] = useState(0);
+            const [isLoading, setIsLoading] = useState(false);
+            const [showCreateForm, setShowCreateForm] = useState(false);
+
+            // Form state
+            const [formData, setFormData] = useState({
+                name: '',
+                description: '',
+                walrusBlobId: '',
+                nodeCount: 0,
+                relationshipCount: 0,
+                isPublic: true,
+                tags: ''
+            });
+
+            // Mock contract constants (replace with your actual values)
+            const CONTRACT_INFO = {
+                packageId: "0xe21c81834611d67b92751acb642d8b6587ce5da730cebace0d5f874015b92afa",
+                registryId: "0xc09065c827a619ee2a3206017ddcd748ec89e4ac1520dbef57c2ef27e711d9fc"
+            };
+
+            // Mock functions (replace with actual Sui client calls)
+            const mockCreateGraph = async (data) => {
+                setIsLoading(true);
+                // Simulate API call
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const newGraph = {
+                    id: `graph_${Date.now()}`,
+                    name: data.name,
+                    description: data.description,
+                    walrusBlobId: data.walrusBlobId,
+                    nodeCount: data.nodeCount,
+                    relationshipCount: data.relationshipCount,
+                    isPublic: data.isPublic,
+                    tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+                    createdAt: Date.now(),
+                    version: 1,
+                    owner: "0xd5c5a01d981e81100f5eefcdb33b34ba181c13844745ff54799ddb216721eacb"
+                };
+
+                setGraphs(prev => [...prev, newGraph]);
+                setTotalGraphs(prev => prev + 1);
+                setIsLoading(false);
+                setShowCreateForm(false);
+
+                // Reset form
+                setFormData({
+                    name: '',
+                    description: '',
+                    walrusBlobId: '',
+                    nodeCount: 0,
+                    relationshipCount: 0,
+                    isPublic: true,
+                    tags: ''
+                });
+            };
+
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({
+                    ...prev,
+                    [field]: value
+                }));
+            };
+
+            const handleSubmit = async () => {
+                await mockCreateGraph(formData);
+            };
+
+            // Load initial data
+            useEffect(() => {
+                // Mock initial data
+                setTotalGraphs(0);
+                setGraphs([]);
+            }, []);
+
+            return (
+                <div className="max-w-6xl mx-auto p-6 space-y-6">
+                    {/* Header */}
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Graph Manager</h1>
+                            <p className="text-gray-600 mt-1">Manage your decentralized graphs on Sui + Walrus</p>
+                        </div>
+                        <Button
+                            onClick={() => setShowCreateForm(!showCreateForm)}
+                            className="flex items-center gap-2"
+                        >
+                            <Plus className="h-4 w-4" />
+                            Create Graph
+                        </Button>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <Database className="h-8 w-8 text-blue-500" />
+                                    <div>
+                                        <p className="text-sm text-gray-600">Total Graphs</p>
+                                        <p className="text-2xl font-bold">{totalGraphs}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <Eye className="h-8 w-8 text-green-500" />
+                                    <div>
+                                        <p className="text-sm text-gray-600">Public Graphs</p>
+                                        <p className="text-2xl font-bold">{graphs.filter(g => g.isPublic).length}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-4">
+                                <div className="flex items-center gap-3">
+                                    <Users className="h-8 w-8 text-purple-500" />
+                                    <div>
+                                        <p className="text-sm text-gray-600">My Graphs</p>
+                                        <p className="text-2xl font-bold">{graphs.length}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Contract Info */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Contract Information</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <Label className="font-medium text-gray-700">Package ID</Label>
+                                    <p className="font-mono text-xs bg-gray-100 p-2 rounded mt-1 break-all">
+                                        {CONTRACT_INFO.packageId}
+                                    </p>
+                                </div>
+                                <div>
+                                    <Label className="font-medium text-gray-700">Registry ID</Label>
+                                    <p className="font-mono text-xs bg-gray-100 p-2 rounded mt-1 break-all">
+                                        {CONTRACT_INFO.registryId}
+                                    </p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Create Form */}
+                    {showCreateForm && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Create New Graph</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <Label htmlFor="name">Graph Name</Label>
+                                            <Input
+                                                id="name"
+                                                value={formData.name}
+                                                onChange={(e) => handleInputChange('name', e.target.value)}
+                                                placeholder="Enter graph name"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="walrusBlobId">Walrus Blob ID</Label>
+                                            <Input
+                                                id="walrusBlobId"
+                                                value={formData.walrusBlobId}
+                                                onChange={(e) => handleInputChange('walrusBlobId', e.target.value)}
+                                                placeholder="Enter Walrus blob ID"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="description">Description</Label>
+                                        <Textarea
+                                            id="description"
+                                            value={formData.description}
+                                            onChange={(e) => handleInputChange('description', e.target.value)}
+                                            placeholder="Enter graph description"
+                                            rows={3}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <Label htmlFor="nodeCount">Node Count</Label>
+                                            <Input
+                                                id="nodeCount"
+                                                type="number"
+                                                value={formData.nodeCount}
+                                                onChange={(e) => handleInputChange('nodeCount', parseInt(e.target.value) || 0)}
+                                                min="0"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <Label htmlFor="relationshipCount">Relationship Count</Label>
+                                            <Input
+                                                id="relationshipCount"
+                                                type="number"
+                                                value={formData.relationshipCount}
+                                                onChange={(e) => handleInputChange('relationshipCount', parseInt(e.target.value) || 0)}
+                                                min="0"
+                                            />
+                                        </div>
+
+                                        <div className="flex items-center space-x-2 pt-6">
+                                            <Switch
+                                                id="isPublic"
+                                                checked={formData.isPublic}
+                                                onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
+                                            />
+                                            <Label htmlFor="isPublic">Public Graph</Label>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <Label htmlFor="tags">Tags (comma separated)</Label>
+                                        <Input
+                                            id="tags"
+                                            value={formData.tags}
+                                            onChange={(e) => handleInputChange('tags', e.target.value)}
+                                            placeholder="blockchain, network, analysis"
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <Button onClick={handleSubmit} disabled={isLoading}>
+                                            {isLoading ? 'Creating...' : 'Create Graph'}
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => setShowCreateForm(false)}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Graphs List */}
+                    <div className="space-y-4">
+                        <h2 className="text-xl font-semibold">Your Graphs</h2>
+
+                        {graphs.length === 0 ? (
+                            <Card>
+                                <CardContent className="p-8 text-center">
+                                    <Database className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                    <p className="text-gray-600">No graphs created yet</p>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        Create your first graph to get started
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {graphs.map((graph) => (
+                                    <Card key={graph.id} className="hover:shadow-lg transition-shadow">
+                                        <CardHeader className="pb-3">
+                                            <div className="flex justify-between items-start">
+                                                <CardTitle className="text-lg truncate">{graph.name}</CardTitle>
+                                                <div className="flex gap-1">
+                                                    {graph.isPublic && <Eye className="h-4 w-4 text-green-500" />}
+                                                    <Share2 className="h-4 w-4 text-gray-400" />
+                                                </div>
+                                            </div>
+                                        </CardHeader>
+
+                                        <CardContent className="space-y-3">
+                                            <p className="text-sm text-gray-600 line-clamp-2">{graph.description}</p>
+
+                                            <div className="flex justify-between text-xs text-gray-500">
+                                                <span>Nodes: {graph.nodeCount}</span>
+                                                <span>Relations: {graph.relationshipCount}</span>
+                                                <span>v{graph.version}</span>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-1">
+                                                {graph.tags.map((tag, idx) => (
+                                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                                        {tag}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+
+                                            <div className="text-xs text-gray-500">
+                                                Walrus ID: {graph.walrusBlobId.substring(0, 12)}...
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- RENDER THE COMPONENT ---
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(GraphManager));
+
+    </script>
+</body>
+</html>

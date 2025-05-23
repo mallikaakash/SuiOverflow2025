@@ -1,0 +1,34 @@
+xfbed2989f4ac16e3ef497a2e1cd0c010d17eff6c47e38ba92c53d8c5c6a8e142]
+Secret Recovery Phrase : [shift nasty fragile invite stone prosper draft magnet rely cricket vocal aunt]
+
+
+ alias          │ naughty-coral                                                      │
+│ address        │ 0xd5c5a01d981e81100f5eefcdb33b34ba181c13844745ff54799ddb216721eacb │
+│ keyScheme      │ ed25519                                                            │
+│ recoveryPhrase │ note cycle oppose bullet seat wet slush absorb much draw fun throw │
+
+----------------------------------------------------------------------------
+ ObjectID: 0x7be36ea00a9f5e417cfacdfe1c3fae96f20227b8b7af7d6711d25d90e6e696d2                            │
+│  │ Sender: 0xd5c5a01d981e81100f5eefcdb33b34ba181c13844745ff54799ddb216721eacb                              │
+│  │ Owner: Shared( 349179519 )                                                        
+                      │
+│  │ ObjectType: 0xddb466fd628242fe4da51e9bdf18b9d9acdfa516e52beeb7e54b66a2e95faf36::aqi_protocol::Protocol  │
+│  │ Version: 349179519                                                                
+                      │
+│  │ Digest: 6KGw7d8pHKyXUJrdDzvEvRvg8hq4zRXXE81CNyM3ouAa 
+
+-------------------------------------------------------------------------
+ Published Objects:                                                                   
+                      │
+│  ┌──                                                                                 
+                      │
+│  │ PackageID: 0xddb466fd628242fe4da51e9bdf18b9d9acdfa516e52beeb7e54b66a2e95faf36                           │
+│  │ Version: 1                                                                        
+                      │
+│  │ Digest: 9R8SYTmuoGheBcmYAzdjoZjCTG1A1EKGoFGbwB4DeE2f                              
+                      │
+│  │ Modules: aqi_protocol                                                             
+                      │
+│  └──        
+
+sui client call --package 0xddb466fd628242fe4da51e9bdf18b9d9acdfa516e52beeb7e54b66a2e95faf36 --module aqi_protocol --function upload_aqi --args 0x7be36ea00a9f5e417cfacdfe1c3fae96f20227b8b7af7d6711d25d90e6e696d2 "lat:37.7749,lon:-122.4194" 50 --gas-budget 10000000
